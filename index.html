@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>苏哲在看你 - 恐怖长动画</title>
+  <style>
+    /* 页面占满全屏，隐藏滚动条 */
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+      font-family: "微软雅黑", sans-serif;
+    }
+
+    /* 让背景进行持续的暗闪烁 */
+    @keyframes bgFlash {
+      0%, 100% { background-color: #000; }
+      50%      { background-color: #111; }
+    }
+
+    body {
+      animation: bgFlash 3s infinite;
+      position: relative;
+    }
+
+    /* 中心恐怖大标题 */
+    h1 {
+      position: absolute;
+      top: 30%;
+      width: 100%;
+      text-align: center;
+      color: red;
+      font-size: 5em;
+      text-shadow: 0 0 10px #fff, 0 0 20px red;
+      margin: 0;
+      opacity: 0;
+      transition: opacity 2s ease-in-out;
+      z-index: 1000;
+    }
+
+    /* 副标题 */
+    h2 {
+      position: absolute;
+      top: 40%;
+      width: 100%;
+      text-align: center;
+      color: #c00;
+      font-size: 2.5em;
+      text-shadow: 0 0 5px #fff, 0 0 10px red;
+      margin: 0;
+      opacity: 0;
+      transition: opacity 3s ease;
+      z-index: 1000;
+    }
+
+    /* 文字不断抖动（轻微） */
+    .shake {
+      animation: shake 0.15s infinite alternate;
+    }
+    @keyframes shake {
+      from { transform: translateX(-2px); }
+      to   { transform: translateX(2px); }
+    }
+
+    /* 提示文字的漂浮/出现/消失 */
+    .float-text {
+      position: absolute;
+      color: #fff;
+      font-size: 1.7em;
+      text-shadow: 0 0 5px #f00, 0 0 10px #fff;
+      opacity: 0;
+      animation: floatText 3s forwards;
+      pointer-events: none;
+    }
+    @keyframes floatText {
+      0% {
+        transform: translateY(0px);
+        opacity: 0;
+      }
+      30% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-50px);
+        opacity: 0;
+      }
+    }
+
+    /* 闪烁效果 */
+    .flicker {
+      animation: flicker 1.5s linear infinite;
+    }
+    @keyframes flicker {
+      0%   { opacity: 1; }
+      5%   { opacity: 0.4; }
+      10%  { opacity: 1; }
+      15%  { opacity: 0.6; }
+      20%  { opacity: 1; }
+      25%  { opacity: 0.2; }
+      30%  { opacity: 1; }
+      100% { opacity: 1; }
+    }
+
+    /* 跳出式惊吓图片 */
+    .jumpscare-img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 0;
+      height: 0;
+      opacity: 0;
+      transition: all 1s ease;
+      z-index: 9999;
+    }
+    .show {
+      width: 40vw;
+      height: auto;
+      opacity: 1;
+    }
+
+    /* 多段音频控制按钮，可隐藏或保留 */
+    .audio-control {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      color: #fff;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      border: 1px solid #444;
+      cursor: pointer;
+      z-index: 2000;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 背景音频1：阴森气氛 -->
+<audio id="bg-audio1" src="https://www.ashamaluevmusic.com/storage/files/previews/856-suspense-hip-hop-preview.mp3" loop></audio>
+<!-- 背景音频2：滴水声、低语声等(示例链接；请自行更换真实资源) -->
+<audio id="bg-audio2" src="https://www.ashamaluevmusic.com/storage/files/previews/69-nightmare-scene-preview.mp3" loop></audio>
+<!-- 突发音效(惊吓时) -->
+<audio id="shock-audio" src="https://www.fesliyanstudios.com/play-mp3/387" ></audio>
+
+<h1 id="title">苏哲…在看你…</h1>
+<h2 id="subtitle">……不要回头……</h2>
+
+<!-- 跳出式惊吓图片（可自行更换） -->
+<img id="jumpscare1" class="jumpscare-img" src="https://i.ibb.co/fSGdKvk/scary.png" alt="惊吓图片" />
+<img id="jumpscare2" class="jumpscare-img" src="https://i.ibb.co/jz0vjVb/scary2.png" alt="惊吓图片" style="display:none" />
+
+<!-- 点击播放音频的简易按钮（可隐藏） -->
+<div class="audio-control" id="audioBtn">点击开启/关闭背景音</div>
+
+<script>
+  /********************************************************
+   * 在这里自定义要出现的“恐怖文本”，可以加更多。
+   ********************************************************/
+  const scaryTexts = [
+    "苏哲在看你……",
+    "你听到他的脚步声了吗？",
+    "滴答……滴答……",
+    "别尝试逃离，他一直跟着你……",
+    "你为什么还没回头？",
+    "所有黑暗的角落里，都有苏哲的目光……",
+    "他就在你身后……",
+    "嘘……安静一点……",
+    "逃不掉，躲不掉……",
+    "眼睛……那些凝视的眼睛……",
+    "苏哲的低语，在耳边回荡……",
+    "你感受到他的呼吸了吗？……",
+    "那扇门后面有什么？",
+    "看不见的手，已经伸向你……",
+    "你是否察觉到阴影在晃动？",
+    "苏哲早已盯紧你……",
+    "黑暗之中，只有你和他的呼吸声……",
+    "咯……吱……咯……吱……",
+    "……晚了……一切都晚了……",
+    "无处可逃……",
+    "别看屏幕了，看你周围……",
+    "他……来了……"
+  ];
+
+  const title = document.getElementById('title');
+  const subtitle = document.getElementById('subtitle');
+  const jump1 = document.getElementById('jumpscare1');
+  const jump2 = document.getElementById('jumpscare2');
+
+  const bgAudio1 = document.getElementById('bg-audio1');
+  const bgAudio2 = document.getElementById('bg-audio2');
+  const shockAudio = document.getElementById('shock-audio');
+
+  const audioBtn = document.getElementById('audioBtn');
+
+  let audioPlaying = false;
+
+  /********************************************************
+   * 点击按钮切换音频播放/暂停
+   ********************************************************/
+  audioBtn.addEventListener('click', () => {
+    if (!audioPlaying) {
+      // 播放两段背景音频
+      bgAudio1.play().catch(()=>{});
+      bgAudio2.play().catch(()=>{});
+      audioBtn.textContent = "点击暂停背景音";
+      audioPlaying = true;
+    } else {
+      bgAudio1.pause();
+      bgAudio2.pause();
+      audioBtn.textContent = "点击开启背景音";
+      audioPlaying = false;
+    }
+  });
+
+  /********************************************************
+   * 自动（或在第一次点击后）播放背景音
+   * 某些浏览器会阻止自动播放，需要用户交互
+   ********************************************************/
+  document.body.addEventListener('click', () => {
+    if (!audioPlaying) {
+      bgAudio1.play().catch(()=>{});
+      bgAudio2.play().catch(()=>{});
+      audioPlaying = true;
+      audioBtn.textContent = "点击暂停背景音";
+    }
+  }, {once: true});
+
+  /********************************************************
+   * 逐渐显示标题
+   ********************************************************/
+  setTimeout(() => {
+    title.style.opacity = 1;
+    title.classList.add('shake');
+  }, 1000);
+
+  setTimeout(() => {
+    subtitle.style.opacity = 1;
+    subtitle.classList.add('shake');
+  }, 3000);
+
+  /********************************************************
+   * 不断随机生成文字提示
+   ********************************************************/
+  function createScaryText() {
+    const div = document.createElement('div');
+    div.classList.add('float-text', 'flicker');
+
+    // 随机从 scaryTexts 数组里取一句
+    const randomIndex = Math.floor(Math.random() * scaryTexts.length);
+    div.textContent = scaryTexts[randomIndex];
+
+    // 随机出现位置
+    const x = Math.random() * (window.innerWidth - 200);
+    const y = Math.random() * (window.innerHeight - 100);
+    div.style.left = x + 'px';
+    div.style.top = y + 'px';
+
+    document.body.appendChild(div);
+
+    // 3秒后移除
+    setTimeout(() => {
+      document.body.removeChild(div);
+    }, 3000);
+  }
+
+  // 定时器：每2~4秒随机出现一次文字
+  setInterval(createScaryText, 2000 + Math.random() * 2000);
+
+  /********************************************************
+   * 分阶段触发：跳出式惊吓
+   * 你可以添加更多阶段，或循环不同的惊吓画面
+   ********************************************************/
+  // 第一次惊吓：10秒后
+  setTimeout(() => {
+    jump1.classList.add('show');
+    shockAudio.play().catch(()=>{});
+
+    // 出现后4秒移除
+    setTimeout(() => {
+      jump1.classList.remove('show');
+    }, 4000);
+  }, 10000);
+
+  // 第二次惊吓：25秒后
+  setTimeout(() => {
+    jump2.style.display = 'block';
+    jump2.classList.add('show');
+    shockAudio.play().catch(()=>{});
+
+    setTimeout(() => {
+      jump2.classList.remove('show');
+    }, 4000);
+  }, 25000);
+
+  /********************************************************
+   * 标题和副标题文字在后续做更多变化
+   ********************************************************/
+  setTimeout(() => {
+    title.textContent = "……逃不掉……";
+  }, 15000);
+
+  setTimeout(() => {
+    subtitle.textContent = "他……就在你背后……";
+  }, 20000);
+
+  /********************************************************
+   * 你可以继续添加更多阶段性的事件
+   * 例如：改文字、改背景、增加更多跳出图片等
+   ********************************************************/
+
+</script>
+
+</body>
+</html>
