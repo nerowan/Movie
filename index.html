@@ -121,43 +121,23 @@
       height: auto;
       opacity: 1;
     }
-
-    /* 多段音频控制按钮，可隐藏或保留 */
-    .audio-control {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      color: #fff;
-      padding: 10px;
-      background: rgba(0, 0, 0, 0.3);
-      border: 1px solid #444;
-      cursor: pointer;
-      z-index: 2000;
-    }
   </style>
 </head>
 <body>
 
-<!-- 背景音频1：阴森气氛 -->
-<audio id="bg-audio1" src="https://www.ashamaluevmusic.com/storage/files/previews/856-suspense-hip-hop-preview.mp3" loop></audio>
-<!-- 背景音频2：滴水声、低语声等(示例链接；请自行更换真实资源) -->
-<audio id="bg-audio2" src="https://www.ashamaluevmusic.com/storage/files/previews/69-nightmare-scene-preview.mp3" loop></audio>
-<!-- 突发音效(惊吓时) -->
-<audio id="shock-audio" src="https://www.fesliyanstudios.com/play-mp3/387" ></audio>
+<!-- 如果连惊吓音效也不需要，可将此 audio 标签删除 -->
+<audio id="shock-audio" src="https://www.fesliyanstudios.com/play-mp3/387"></audio>
 
 <h1 id="title">苏哲…在看你…</h1>
 <h2 id="subtitle">……不要回头……</h2>
 
-<!-- 跳出式惊吓图片（可自行更换） -->
-<img id="jumpscare1" class="jumpscare-img" src="https://i.ibb.co/fSGdKvk/scary.png" alt="惊吓图片" />
-<img id="jumpscare2" class="jumpscare-img" src="https://i.ibb.co/jz0vjVb/scary2.png" alt="惊吓图片" style="display:none" />
-
-<!-- 点击播放音频的简易按钮（可隐藏） -->
-<div class="audio-control" id="audioBtn">点击开启/关闭背景音</div>
+<!-- 跳出式惊吓图片（本地文件 suzhe.jpg） -->
+<img id="jumpscare1" class="jumpscare-img" src="suzhe.jpg" alt="苏哲" />
+<img id="jumpscare2" class="jumpscare-img" src="suzhe.jpg" alt="苏哲" style="display:none" />
 
 <script>
   /********************************************************
-   * 在这里自定义要出现的“恐怖文本”，可以加更多。
+   * 自定义要出现的“恐怖文本”
    ********************************************************/
   const scaryTexts = [
     "苏哲在看你……",
@@ -175,7 +155,6 @@
     "那扇门后面有什么？",
     "看不见的手，已经伸向你……",
     "你是否察觉到阴影在晃动？",
-    "苏哲早已盯紧你……",
     "黑暗之中，只有你和他的呼吸声……",
     "咯……吱……咯……吱……",
     "……晚了……一切都晚了……",
@@ -189,47 +168,11 @@
   const jump1 = document.getElementById('jumpscare1');
   const jump2 = document.getElementById('jumpscare2');
 
-  const bgAudio1 = document.getElementById('bg-audio1');
-  const bgAudio2 = document.getElementById('bg-audio2');
+  // 如果你不需要惊吓音效，可注释或删除这行
   const shockAudio = document.getElementById('shock-audio');
 
-  const audioBtn = document.getElementById('audioBtn');
-
-  let audioPlaying = false;
-
   /********************************************************
-   * 点击按钮切换音频播放/暂停
-   ********************************************************/
-  audioBtn.addEventListener('click', () => {
-    if (!audioPlaying) {
-      // 播放两段背景音频
-      bgAudio1.play().catch(()=>{});
-      bgAudio2.play().catch(()=>{});
-      audioBtn.textContent = "点击暂停背景音";
-      audioPlaying = true;
-    } else {
-      bgAudio1.pause();
-      bgAudio2.pause();
-      audioBtn.textContent = "点击开启背景音";
-      audioPlaying = false;
-    }
-  });
-
-  /********************************************************
-   * 自动（或在第一次点击后）播放背景音
-   * 某些浏览器会阻止自动播放，需要用户交互
-   ********************************************************/
-  document.body.addEventListener('click', () => {
-    if (!audioPlaying) {
-      bgAudio1.play().catch(()=>{});
-      bgAudio2.play().catch(()=>{});
-      audioPlaying = true;
-      audioBtn.textContent = "点击暂停背景音";
-    }
-  }, {once: true});
-
-  /********************************************************
-   * 逐渐显示标题
+   * 逐渐显示标题与副标题
    ********************************************************/
   setTimeout(() => {
     title.style.opacity = 1;
@@ -271,12 +214,12 @@
 
   /********************************************************
    * 分阶段触发：跳出式惊吓
-   * 你可以添加更多阶段，或循环不同的惊吓画面
    ********************************************************/
   // 第一次惊吓：10秒后
   setTimeout(() => {
     jump1.classList.add('show');
-    shockAudio.play().catch(()=>{});
+    // 如果需要惊吓音效，就播放
+    shockAudio && shockAudio.play().catch(()=>{});
 
     // 出现后4秒移除
     setTimeout(() => {
@@ -288,7 +231,7 @@
   setTimeout(() => {
     jump2.style.display = 'block';
     jump2.classList.add('show');
-    shockAudio.play().catch(()=>{});
+    shockAudio && shockAudio.play().catch(()=>{});
 
     setTimeout(() => {
       jump2.classList.remove('show');
@@ -310,7 +253,6 @@
    * 你可以继续添加更多阶段性的事件
    * 例如：改文字、改背景、增加更多跳出图片等
    ********************************************************/
-
 </script>
 
 </body>
